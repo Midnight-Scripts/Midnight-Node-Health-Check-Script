@@ -6,40 +6,23 @@ set -euo pipefail  # Exit on error, undefined vars, pipe failures
 
 # Configuration - Consider moving to external config file
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PING_BASE="https://hc-ping.com/YOUR-UNIQUE-HEALTHCHECK-ID"
+readonly PING_BASE="https://hc-ping.com/b09f7514-98d1-4ee8-a58b-a9573d256854"
 readonly RPC_URL="${RPC_URL:-http://127.0.0.1:9944}"
 readonly MAX_ALLOWED_GAP="${MAX_ALLOWED_GAP:-25}"
 readonly NODE_ID="${NODE_ID:-midnight-validator-1}"
 readonly TIMEOUT="${TIMEOUT:-10}"
 readonly LOG_FILE="${LOG_FILE:-$SCRIPT_DIR/healthchecks.log}"
 
-# Logging function - ultra minimal
+# Logging function
 log() {
     local level="$1"
     shift
     
-    # Create log file if it doesn't exist
     if [[ ! -f "$LOG_FILE" ]]; then
-        touch "$LOG_FILE" || {
-            echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] Cannot create log file: $LOG_FILE" >&2
-            return 1
-        }
+        touch "$LOG_FILE" || return 1
     fi
     
-    # Only log timestamp and status indicator
-    case "$level" in
-        "SUCCESS") echo "$(date '+%Y-%m-%d %H:%M:%S') ✅" >> "$LOG_FILE" ;;
-        "FAIL") echo "$(date '+%Y-%m-%d %H:%M:%S') ❌" >> "$LOG_FILE" ;;
-        "ERROR") echo "$(date '+%Y-%m-%d %H:%M:%S') 💥" >> "$LOG_FILE" ;;
-        *) echo "$(date '+%Y-%m-%d %H:%M:%S') $level" >> "$LOG_FILE" ;;
-    esac
-    
-    # Keep only last 1000 entries
-    if [[ -f "$LOG_FILE" ]]; then
-        local temp_file
-        temp_file=$(mktemp)
-        tail -n 1000 "$LOG_FILE" > "$temp_file" && mv "$temp_file" "$LOG_FILE"
-    fi
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$level] $*" | tee -a "$LOG_FILE"
 }
 
 # Error handling
@@ -187,13 +170,17 @@ EOF
 
 # Main monitoring logic
 main() {
+    log "INFO" "Starting node monitoring for $NODE_ID"
+    
     # Check dependencies
     check_dependencies
     
     # Get block numbers
+    log "INFO" "Fetching latest block..."
     local latest_block
     latest_block=$(get_latest_block)
     
+    log "INFO" "Fetching finalized block..."
     local finalized_block
     finalized_block=$(get_finalized_block)
     
@@ -209,16 +196,16 @@ main() {
     # Determine health status and send appropriate ping
     if [[ "$gap" -ge 0 ]] && [[ "$gap" -le "$MAX_ALLOWED_GAP" ]]; then
         if send_ping "$PING_BASE" "$status_message" "$NODE_ID"; then
-            log "SUCCESS"
+            log "INFO" "✅ Health check passed - ping sent successfully"
             echo -e "✅ Node is healthy\n$status_message"
         else
             error_exit "Failed to send success ping"
         fi
     else
         if send_ping "$PING_BASE/fail" "$status_message" "$NODE_ID"; then
-            log "FAIL"
+            log "WARN" "❌ Health check failed - failure ping sent"
         else
-            log "ERROR"
+            log "ERROR" "Failed to send failure ping"
         fi
         echo -e "❌ Node lag too high!\n$status_message"
         exit 1
@@ -226,7 +213,7 @@ main() {
 }
 
 # Trap signals for clean exit
-trap 'log "ERROR"; exit 130' INT TERM
+trap 'log "INFO" "Script interrupted"; exit 130' INT TERM
 
 # Run main function
 main "$@"
