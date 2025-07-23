@@ -6,7 +6,7 @@ set -euo pipefail  # Exit on error, undefined vars, pipe failures
 
 # Configuration - Consider moving to external config file
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PING_BASE="https://hc-ping.com/b09f7514-98d1-4ee8-a58b-a9573d256854"
+readonly PING_BASE="https://hc-ping.com/YOUR-UNIQUE-HEALTHCHECK-ID"
 readonly RPC_URL="${RPC_URL:-http://127.0.0.1:9944}"
 readonly MAX_ALLOWED_GAP="${MAX_ALLOWED_GAP:-25}"
 readonly NODE_ID="${NODE_ID:-midnight-validator-1}"
