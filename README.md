@@ -46,22 +46,17 @@ Replace `YOUR-UNIQUE-HEALTHCHECK-ID` with your Healthchecks.io check ID.
 
 ## Installation
 
-1. **Clone the repository:**
+1. **Download the script:**
 ```bash
-git clone https://github.com/yourusername/midnight-healthcheck.git
-cd midnight-healthcheck
+wget https://raw.githubusercontent.com/Midnight-Scripts/Midnight-Node-Health-Check-Script/refs/heads/main/midnight-healthcheck.sh
+chmod +x midnight-healthcheck.sh
 ```
 
-2. **Make the script executable:**
-```bash
-chmod +x HealthCheck/test_new.sh
-```
+2. **Update the health check URL** (see Configuration section above)
 
-3. **Update the health check URL** (see Configuration section above)
-
-4. **Test the script:**
+3. **Test the script:**
 ```bash
-./HealthCheck/test_new.sh
+./midnight-healthcheck.sh
 ```
 
 ## Setting Up Cron Job
@@ -75,7 +70,7 @@ crontab -e
 
 ### 2. Add this line to run every minute:
 ```bash
-* * * * * /home/midnight/md_scripts/midnight-healthcheck.sh
+* * * * * /path/to/midnight-healthcheck.sh
 ```
 
 ### 3. Verify cron job is working:
@@ -91,12 +86,12 @@ sudo tail -f /var/log/syslog | grep CRON
 
 ### Manual Run
 ```bash
-./HealthCheck/test_new.sh
+./midnight-healthcheck.sh
 ```
 
 ### With Custom Configuration
 ```bash
-NODE_ID="my-validator" MAX_ALLOWED_GAP="30" ./HealthCheck/test_new.sh
+NODE_ID="my-validator" MAX_ALLOWED_GAP="30" ./midnight-healthcheck.sh
 ```
 
 ## Expected Output
@@ -146,7 +141,7 @@ The script sends different HTTP requests for success/failure:
 
 **1. Permission Denied:**
 ```bash
-chmod +x HealthCheck/test_new.sh
+chmod +x midnight-healthcheck.sh
 ```
 
 **2. Dependencies Missing:**
@@ -169,10 +164,10 @@ sudo journalctl -u cron
 
 View recent health check logs:
 ```bash
-tail -f HealthCheck/healthchecks.log
+tail -f healthchecks.log
 ```
 
 Check for errors:
 ```bash
-grep ERROR HealthCheck/healthchecks.log
+grep ERROR healthchecks.log
 ``` 
