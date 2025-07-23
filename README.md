@@ -89,7 +89,7 @@ sudo tail -f /var/log/syslog | grep CRON
 ./midnight-healthcheck.sh
 ```
 
-**Note:** The script automatically creates a log file (`healthchecks.log`) in the same directory where the script is located. This log file contains timestamps and status indicators (✅ for success, ❌ for failure, 💥 for errors) and keeps only the last 1000 entries.
+**Note:** The script automatically creates a log file (`healthchecks.log`) in the same directory where the script is located. This log file contains timestamps and status indicators (✅ for success, ❌ for failure, 💥 for errors).
 
 ## Expected Output
 
