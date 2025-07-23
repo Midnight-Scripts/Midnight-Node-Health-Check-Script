@@ -1,6 +1,6 @@
 # Midnight Node Health Check Script
 
-A monitoring script for Midnight blockchain nodes that checks node synchronization status and reports health metrics to Healthchecks.io.
+A monitoring script for Midnight validator node that checks node synchronization status and reports health metrics to Healthchecks.io.
 
 ## Features
 
